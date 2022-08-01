@@ -4,7 +4,8 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
-    HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    Game: typeof import('./components/Game.vue')['default']
+    MineBlock: typeof import('./components/MineBlock.vue')['default']
   }
 }
 
