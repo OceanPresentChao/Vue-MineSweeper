@@ -38,7 +38,15 @@ export class GameController {
             if (!this.blocks[x][y].isMine) {
                 this.blocks[x][y].isMine = true
                 count++
+                for (let i = x - 1; i <= x + 1; i++) {
+                    for (let j = y - 1; j <= y + 1; j++) {
+                        if (i >= 0 && i < this.width && j >= 0 && j < this.height) {
+                            this.blocks[i][j].aroundMines++
+                        }
+                    }
+                }
             }
         }
+
     }
 }
