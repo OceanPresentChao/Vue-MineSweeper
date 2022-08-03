@@ -1,7 +1,7 @@
 <template>
     <div>
         <button class="flex justify-center items-center flex-col border-2  m-0.5" :class="getMineClass(block)"
-            style="min-width: 2rem;min-height:2rem;">
+            style="min-width: 2rem;min-height:2rem;" @mousedown="handleMouse($event)">
             {{ block.aroundMines }}
         </button>
     </div>
@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import type { GameBlock } from "@/utils/GameBlock"
 const props = defineProps<{ block: GameBlock }>()
-
+const emits = defineEmits(['lrclick', 'lclick', 'rclick'])
 const blockColors = [
     'text-transparent',
     'text-blue-500',
@@ -32,6 +32,18 @@ function getMineClass(block: GameBlock) {
     return block.isMine
         ? 'bg-red-500/50'
         : blockColors[block.aroundMines]
+}
+
+function handleMouse($event: MouseEvent) {
+    // console.log($event);
+    if ($event.buttons === 3) {
+        emits("lrclick")
+    } else if ($event.buttons === 1) {
+        emits("lclick")
+    }
+    else if ($event.buttons === 2) {
+        emits("rclick")
+    }
 }
 </script>
 

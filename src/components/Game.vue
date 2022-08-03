@@ -10,7 +10,9 @@
         <template v-if="Game">
             <div class="flex items-center justify-center">
                 <div v-for="(row, x) in Game?.blocks" class="flex items-center justify-center flex-col" :key="x">
-                    <MineBlock v-for="(block, y) in row" :block="block" :key="y"></MineBlock>
+                    <MineBlock v-for="(block, y) in row" :block="block" :key="y" @lclick="Game?.openBlock(block)"
+                        @lrclick="Game?.autoOpen(block)" @rclick="Game?.setFlag(block)" @contextmenu.prevent="void">
+                    </MineBlock>
                 </div>
             </div>
         </template>
