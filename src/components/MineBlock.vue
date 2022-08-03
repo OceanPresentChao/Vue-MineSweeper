@@ -2,7 +2,17 @@
     <div>
         <button class="flex justify-center items-center flex-col border-2  m-0.5" :class="getMineClass(block)"
             style="min-width: 2rem;min-height:2rem;" @mousedown="handleMouse($event)">
-            {{ block.aroundMines }}
+            <template v-if="block.isFlag">
+                <div>
+                    <Icon class=" text-red-500 " icon="bxs:flag-checkered" width="22"></Icon>
+                </div>
+            </template>
+            <template v-else-if="block.isOpen">
+                <div v-if="block.isMine" class="text-black" icon="mdi:mine" />
+                <div v-else>
+                    {{ block.aroundMines }}
+                </div>
+            </template>
         </button>
     </div>
 </template>

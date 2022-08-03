@@ -1,12 +1,12 @@
 import type { GameOptions } from "./type"
 import { GameStatus } from "./type"
 import { GameBlock } from "./GameBlock"
+import { ref } from "vue"
 const defaultConfig: Required<GameOptions> = {
     width: 5,
     height: 5,
     mine: 5
 }
-
 
 export class GameController {
     status: GameStatus
@@ -49,12 +49,13 @@ export class GameController {
         }
     }
     openBlock(block: GameBlock) {
+        // console.log(block);
         if (block.isFlag || block.isOpen) {
             return
         }
         if (block.isMine) {
             this.status = GameStatus.LOSE
-            this.showLose()
+            this.onLose()
             return
         }
         block.isOpen = true
@@ -62,9 +63,9 @@ export class GameController {
     }
     expandZero(block: GameBlock) {
         let aroundBlocks = this.getAroundBlocks(block)
-        console.log(aroundBlocks);
+        // console.log(aroundBlocks);
         for (let b of aroundBlocks) {
-            if (b.aroundMines !== 0 || b.isFlag || b.isMine || b.isOpen) {
+            if (b.isFlag || b.isMine || b.isOpen) {
                 continue
             }
             b.isOpen = true
@@ -75,25 +76,34 @@ export class GameController {
         console.log("auto");
     }
     setFlag(block: GameBlock) {
-        console.log("flag");
+        // console.log("flag");
+        if (block.isOpen) {
+            return
+        }
+        block.isFlag = block.isFlag === true ? false : true
     }
     getAroundBlocks(block: GameBlock) {
         let res: GameBlock[] = []
         let x = block.x
         let y = block.y
+        const directions = [
+            [0, 1],
+            [0, -1],
+            [-1, 0],
+            [1, 0]
+        ]
         // console.log(`x=${x},y=${y}`);
-        for (let i = x - 1; i <= x + 1; i++) {
-            for (let j = y - 1; j <= y + 1; j++) {
-                if (i >= 0 && i < this.width && j >= 0 && j < this.height) {
-                    if (i !== x || j !== y) {
-                        res.push(this.blocks[i][j])
-                    }
-                }
+        for (let [dx, dy] of directions) {
+            let i = x + dx
+            let j = y + dy
+            if (i >= 0 && i < this.width && j >= 0 && j < this.height) {
+                res.push(this.blocks[i][j])
             }
         }
         return res
     }
-    showLose() {
+    onLose() {
         alert("you lose!!")
     }
+
 }
