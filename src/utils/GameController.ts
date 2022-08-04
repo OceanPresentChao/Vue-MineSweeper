@@ -8,18 +8,38 @@ const defaultConfig: Required<GameOptions> = {
     mine: 5
 }
 
+const siblingDirections = [
+    [0, 1],
+    [0, -1],
+    [-1, 0],
+    [1, 0]
+]
+
+const aroundDirections = [
+    [0, 1],
+    [0, -1],
+    [-1, 0],
+    [1, 0],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1]
+]
+
 export class GameController {
     status: GameStatus
     width: number
     height: number
     mine: number
     blocks: Array<Array<GameBlock>>
+    isCheat: boolean
     constructor(options?: GameOptions) {
         let option: Required<GameOptions> = Object.assign.call(defaultConfig, options || {})
         this.status = GameStatus.STOP
         this.width = option.width
         this.height = option.height
         this.mine = option.mine
+        this.isCheat = false
         this.blocks = new Array()
         this.initGame()
     }
@@ -62,9 +82,9 @@ export class GameController {
         this.expandZero(block)
     }
     expandZero(block: GameBlock) {
-        let aroundBlocks = this.getAroundBlocks(block)
+        let siblingBlocks = this.getSiblingBlocks(block, siblingDirections)
         // console.log(aroundBlocks);
-        for (let b of aroundBlocks) {
+        for (let b of siblingBlocks) {
             if (b.isFlag || b.isMine || b.isOpen) {
                 continue
             }
@@ -82,16 +102,10 @@ export class GameController {
         }
         block.isFlag = block.isFlag === true ? false : true
     }
-    getAroundBlocks(block: GameBlock) {
+    getSiblingBlocks(block: GameBlock, directions: Array<Array<number>>) {
         let res: GameBlock[] = []
         let x = block.x
         let y = block.y
-        const directions = [
-            [0, 1],
-            [0, -1],
-            [-1, 0],
-            [1, 0]
-        ]
         // console.log(`x=${x},y=${y}`);
         for (let [dx, dy] of directions) {
             let i = x + dx
@@ -101,6 +115,9 @@ export class GameController {
             }
         }
         return res
+    }
+    toggleCheat() {
+        this.isCheat = this.isCheat === true ? false : true
     }
     onLose() {
         alert("you lose!!")

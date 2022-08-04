@@ -7,8 +7,10 @@
                     <Icon class=" text-red-500 " icon="bxs:flag-checkered" width="22"></Icon>
                 </div>
             </template>
-            <template v-else-if="block.isOpen">
-                <div v-if="block.isMine" class="text-black" icon="mdi:mine" />
+            <template v-else-if="block.isOpen || isCheat">
+                <div v-if="block.isMine">
+                    <Icon class="text-black" icon="mdi:mine" />
+                </div>
                 <div v-else>
                     {{ block.aroundMines }}
                 </div>
@@ -19,7 +21,7 @@
 
 <script setup lang="ts">
 import type { GameBlock } from "@/utils/GameBlock"
-const props = defineProps<{ block: GameBlock }>()
+const props = defineProps<{ block: GameBlock, isCheat: boolean }>()
 const emits = defineEmits(['lrclick', 'lclick', 'rclick'])
 const blockColors = [
     'text-transparent',
