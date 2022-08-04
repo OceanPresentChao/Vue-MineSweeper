@@ -13,9 +13,9 @@
             </div>
             <div class="flex items-center justify-center">
                 <div v-for="(row, x) in Game?.blocks" class="flex items-center justify-center flex-col" :key="x">
-                    <MineBlock v-for="(block, y) in row" :block="block" :isCheat="Game.isCheat" :key="y"
-                        @lclick="Game?.openBlock(block)" @lrclick="Game?.autoOpen(block)" @rclick="Game?.setFlag(block)"
-                        @contextmenu.prevent="void">
+                    <MineBlock v-for="(block, y) in row" :block="block" :isCheat="Game.isCheat"
+                        :key="x * Game.height + y" @lclick="Game?.openBlock(block)" @lrclick="Game?.autoOpen(block)"
+                        @rclick="Game?.setFlag(block)" @contextmenu.prevent="void">
                     </MineBlock>
                 </div>
             </div>
@@ -38,6 +38,9 @@ let options = ref<InputOptions>({
     mine: 5
 })
 function createGame() {
+    if (options.value.mine >= options.value.height * options.value.width) {
+        options.value.mine = options.value.height * options.value.width - 1
+    }
     Game.value = new GameController(options.value)
 }
 </script>

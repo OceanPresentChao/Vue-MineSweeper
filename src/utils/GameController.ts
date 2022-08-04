@@ -33,6 +33,7 @@ export class GameController {
     mine: number
     blocks: Array<Array<GameBlock>>
     isCheat: boolean
+    isFirstClick: boolean
     constructor(options?: GameOptions) {
         let option: Required<GameOptions> = Object.assign.call(defaultConfig, options || {})
         this.status = GameStatus.STOP
@@ -40,6 +41,7 @@ export class GameController {
         this.height = option.height
         this.mine = option.mine
         this.isCheat = false
+        this.isFirstClick = true
         this.blocks = new Array()
         this.initGame()
     }
@@ -50,26 +52,28 @@ export class GameController {
                 this.blocks[i].push(new GameBlock({ x: i, y: j }))
             }
         }
+    }
+    generateMines(block: GameBlock) {
         let count = 0
         while (count < this.mine) {
-            let x = Math.floor(Math.random() * (this.width - 1))
-            let y = Math.floor(Math.random() * (this.height - 1))
-            // console.log(`x=${x},y=${y}`);
-            if (!this.blocks[x][y].isMine) {
+            let x = Math.round(Math.random() * (this.width - 1))
+            let y = Math.round(Math.random() * (this.height - 1))
+            if (!this.blocks[x][y].isMine && !(x === block.x && y === block.y)) {
                 this.blocks[x][y].isMine = true
                 count++
-                for (let i = x - 1; i <= x + 1; i++) {
-                    for (let j = y - 1; j <= y + 1; j++) {
-                        if (i >= 0 && i < this.width && j >= 0 && j < this.height) {
-                            this.blocks[i][j].aroundMines++
-                        }
-                    }
-                }
+                let aroundBlocks = this.getBlocksFromDir(this.blocks[x][y], aroundDirections)
+                aroundBlocks.forEach((b) => {
+                    b.aroundMines++
+                })
             }
         }
     }
     openBlock(block: GameBlock) {
         // console.log(block);
+        if (this.isFirstClick) {
+            this.isFirstClick = false
+            this.generateMines(block)
+        }
         if (block.isFlag || block.isOpen) {
             return
         }
@@ -82,7 +86,7 @@ export class GameController {
         this.expandZero(block)
     }
     expandZero(block: GameBlock) {
-        let siblingBlocks = this.getSiblingBlocks(block, siblingDirections)
+        let siblingBlocks = this.getBlocksFromDir(block, siblingDirections)
         // console.log(aroundBlocks);
         for (let b of siblingBlocks) {
             if (b.isFlag || b.isMine || b.isOpen) {
@@ -93,7 +97,22 @@ export class GameController {
         }
     }
     autoOpen(block: GameBlock) {
-        console.log("auto");
+        // console.log("auto");
+        let aroundBlocks = this.getBlocksFromDir(block, aroundDirections)
+        let flagCount = 0
+        let waitToOpen: GameBlock[] = []
+        for (let b of aroundBlocks) {
+            if (b.isFlag) {
+                flagCount++
+            } else {
+                waitToOpen.push(b)
+            }
+        }
+        if (flagCount === block.aroundMines) {
+            waitToOpen.forEach((b) => {
+                b.isOpen = true
+            })
+        }
     }
     setFlag(block: GameBlock) {
         // console.log("flag");
@@ -102,7 +121,7 @@ export class GameController {
         }
         block.isFlag = block.isFlag === true ? false : true
     }
-    getSiblingBlocks(block: GameBlock, directions: Array<Array<number>>) {
+    getBlocksFromDir(block: GameBlock, directions: Array<Array<number>>) {
         let res: GameBlock[] = []
         let x = block.x
         let y = block.y
