@@ -9,7 +9,12 @@
     <div>
         <template v-if="Game">
             <div>
-                <button @click="Game?.toggleCheat">toggle cheat</button>
+                <button @click="Game?.toggleCheat" :disabled="Game.status !== GameStatus.RUNNING">toggle cheat</button>
+            </div>
+            <div>
+                <p>
+                    Remaining Mines: {{ Game.remaining }}
+                </p>
             </div>
             <div class="flex items-center justify-center">
                 <div v-for="(row, x) in Game?.blocks" class="flex items-center justify-center flex-col" :key="x">
@@ -25,7 +30,7 @@
 
 <script setup lang="ts">
 import { GameController } from "@/utils/GameController"
-
+import { GameStatus } from "@/utils/type"
 const Game = ref<GameController | null>(null)
 interface InputOptions {
     width: number

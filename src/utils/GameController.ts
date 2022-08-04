@@ -31,6 +31,7 @@ export class GameController {
     width: number
     height: number
     mine: number
+    remaining: number
     blocks: Array<Array<GameBlock>>
     isCheat: boolean
     isFirstClick: boolean
@@ -40,6 +41,7 @@ export class GameController {
         this.width = option.width
         this.height = option.height
         this.mine = option.mine
+        this.remaining = option.mine
         this.isCheat = false
         this.isFirstClick = true
         this.blocks = new Array()
@@ -70,9 +72,13 @@ export class GameController {
     }
     openBlock(block: GameBlock) {
         // console.log(block);
-        if (this.isFirstClick) {
+        if (this.isFirstClick && this.status === GameStatus.STOP) {
             this.isFirstClick = false
+            this.status = GameStatus.RUNNING
             this.generateMines(block)
+        }
+        if (this.status !== GameStatus.RUNNING) {
+            return
         }
         if (block.isFlag || block.isOpen) {
             return
@@ -84,6 +90,7 @@ export class GameController {
         }
         block.isOpen = true
         this.expandZero(block)
+        this.checkGameStatus()
     }
     expandZero(block: GameBlock) {
         let siblingBlocks = this.getBlocksFromDir(block, siblingDirections)
@@ -98,6 +105,9 @@ export class GameController {
     }
     autoOpen(block: GameBlock) {
         // console.log("auto");
+        if (this.status !== GameStatus.RUNNING) {
+            return
+        }
         let aroundBlocks = this.getBlocksFromDir(block, aroundDirections)
         let flagCount = 0
         let waitToOpen: GameBlock[] = []
@@ -116,10 +126,11 @@ export class GameController {
     }
     setFlag(block: GameBlock) {
         // console.log("flag");
-        if (block.isOpen) {
+        if (this.status !== GameStatus.RUNNING || block.isOpen || this.remaining <= 0) {
             return
         }
         block.isFlag = block.isFlag === true ? false : true
+        block.isFlag ? this.remaining-- : this.remaining++
     }
     getBlocksFromDir(block: GameBlock, directions: Array<Array<number>>) {
         let res: GameBlock[] = []
@@ -138,8 +149,32 @@ export class GameController {
     toggleCheat() {
         this.isCheat = this.isCheat === true ? false : true
     }
+    checkGameStatus() {
+        const blockArray = this.blocks.flat()
+        let isWin = true
+        for (let b of blockArray) {
+            if (b.isMine && b.isOpen) {
+                this.status = GameStatus.LOSE
+                this.onLose()
+                return
+            }
+            if (!b.isMine && !b.isOpen) {
+                isWin = false
+            }
+        }
+        if (isWin) {
+            this.status = GameStatus.WIN
+            this.onWin()
+            return
+        }
+    }
     onLose() {
+        this.blocks.flat().forEach((b) => {
+            b.isOpen = true
+        })
         alert("you lose!!")
     }
-
+    onWin() {
+        alert("you win!!")
+    }
 }
