@@ -35,6 +35,7 @@ export class GameController {
     blocks: Array<Array<GameBlock>>
     isCheat: boolean
     isFirstClick: boolean
+
     constructor(options?: GameOptions) {
         let option: Required<GameOptions> = Object.assign.call(defaultConfig, options || {})
         this.status = GameStatus.STOP
@@ -44,6 +45,7 @@ export class GameController {
         this.remaining = option.mine
         this.isCheat = false
         this.isFirstClick = true
+
         this.blocks = new Array()
         this.initGame()
     }
@@ -75,6 +77,7 @@ export class GameController {
         if (this.isFirstClick && this.status === GameStatus.STOP) {
             this.isFirstClick = false
             this.status = GameStatus.RUNNING
+
             this.generateMines(block)
         }
         if (this.status !== GameStatus.RUNNING) {

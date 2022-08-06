@@ -22,6 +22,9 @@
                     <button @click="Game?.toggleCheat" :disabled="Game.status !== GameStatus.RUNNING"
                         class="border-red-400 text-red-500 border-2 p-1 rounded-md">toggle cheat</button>
                     <p>
+                        Time: {{ time }}
+                    </p>
+                    <p>
                         Remaining Mines: {{ Game.remaining }}
                     </p>
                 </div>
@@ -32,6 +35,12 @@
                             @rclick="Game?.setFlag(block)" @contextmenu.prevent="void">
                         </MineBlock>
                     </div>
+                </div>
+                <div v-if="false">
+                    <p>
+                        Your Records in <br />
+                        Game(width:{{ options.width }},height:{{ options.height }},mine:{{ options.mine }}):
+                    </p>
                 </div>
             </template>
         </div>
@@ -53,6 +62,24 @@ let options = ref<InputOptions>({
     height: 5,
     mine: 5
 })
+
+const time = ref(0)
+let timer: number = -1
+
+
+watchEffect(() => {
+    if (Game.value) {
+        if (Game.value.status === GameStatus.RUNNING) {
+            time.value = 0
+            timer = setInterval(() => {
+                time.value++
+            }, 1000)
+        } else {
+            clearInterval(timer)
+        }
+    }
+})
+
 function createGame() {
     if (options.value.mine >= options.value.height * options.value.width) {
         options.value.mine = options.value.height * options.value.width - 1

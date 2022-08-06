@@ -11,7 +11,8 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "lib": [
-      "es2019"
+      "es2019",
+      "DOM"
     ],
     "paths": {
       "@/*": [
