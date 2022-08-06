@@ -1,31 +1,42 @@
 <template>
-    <div>
-        <button @click="createGame" class="border-yellow-400 border-2">click me to start</button>
-        <input type="number" placeholder="width" v-model="options.width" :min="1" :step="1">
-        <input type="number" placeholder="height" v-model="options.height" :min="1" :step="1">
-        <input type="number" placeholder="mine" v-model="options.mine" :min="1" :step="1"
-            :max="options.width * options.height - 1">
-    </div>
-    <div>
-        <template v-if="Game">
-            <div>
-                <button @click="Game?.toggleCheat" :disabled="Game.status !== GameStatus.RUNNING">toggle cheat</button>
+    <div class="flex flex-nowrap justify-center">
+        <div class="flex-none mr-auto">
+            <div class="m-1">
+                <button @click="createGame" class="border-yellow-400 text-yellow-500 border-2 p-1 rounded-md">click to
+                    start</button>
             </div>
-            <div>
-                <p>
-                    Remaining Mines: {{ Game.remaining }}
-                </p>
+            <div class="m-1">
+                <input type="number" placeholder="width" v-model="options.width" :min="1" :step="1" class="input-props">
             </div>
-            <div class="flex items-center justify-center">
-                <div v-for="(row, x) in Game?.blocks" class="flex items-center justify-center flex-col" :key="x">
-                    <MineBlock v-for="(block, y) in row" :block="block" :isCheat="Game.isCheat"
-                        :key="x * Game.height + y" @lclick="Game?.openBlock(block)" @lrclick="Game?.autoOpen(block)"
-                        @rclick="Game?.setFlag(block)" @contextmenu.prevent="void">
-                    </MineBlock>
+            <div class="m-1">
+                <input type="number" placeholder="height" v-model="options.height" :min="1" :step="1"
+                    class="input-props">
+            </div>
+            <div class="m-1">
+                <input type="number" placeholder="mine" v-model="options.mine" :min="1" :step="1" class="input-props">
+            </div>
+        </div>
+        <div class="flex-1">
+            <template v-if="Game">
+                <div class="text-center">
+                    <button @click="Game?.toggleCheat" :disabled="Game.status !== GameStatus.RUNNING"
+                        class="border-red-400 text-red-500 border-2 p-1 rounded-md">toggle cheat</button>
+                    <p>
+                        Remaining Mines: {{ Game.remaining }}
+                    </p>
                 </div>
-            </div>
-        </template>
+                <div class="flex items-center justify-center">
+                    <div v-for="(row, x) in Game?.blocks" class="flex items-center justify-center flex-col" :key="x">
+                        <MineBlock v-for="(block, y) in row" :block="block" :isCheat="Game.isCheat"
+                            :key="x * Game.height + y" @lclick="Game?.openBlock(block)" @lrclick="Game?.autoOpen(block)"
+                            @rclick="Game?.setFlag(block)" @contextmenu.prevent="void">
+                        </MineBlock>
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
+
 </template>
 
 <script setup lang="ts">
@@ -46,9 +57,24 @@ function createGame() {
     if (options.value.mine >= options.value.height * options.value.width) {
         options.value.mine = options.value.height * options.value.width - 1
     }
+    if (options.value.mine <= 0) {
+        options.value.mine = 1
+    }
     Game.value = new GameController(options.value)
 }
 </script>
 
 <style scoped>
+.input-props {
+    padding: 0.25rem;
+    font-size: large;
+}
+
+.input-props:focus {
+    border-color: #66afe9;
+    border-radius: 5%;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+}
 </style>
