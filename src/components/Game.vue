@@ -36,10 +36,13 @@
                         </MineBlock>
                     </div>
                 </div>
-                <div v-if="false">
+                <div>
                     <p>
-                        Your Records in <br />
+                        Your Records in
+                        <br />
                         Game(width:{{ options.width }},height:{{ options.height }},mine:{{ options.mine }}):
+                        <br />
+                        {{ records[JSON.stringify(options)] }}
                     </p>
                 </div>
             </template>
@@ -66,6 +69,16 @@ let options = ref<InputOptions>({
 const time = ref(0)
 let timer: number = -1
 
+interface Records {
+    [option: string]: Array<number>
+}
+const records = useLocalStorage("mine-records", {} as Records)
+
+watch(options, (nv) => {
+    if (!records.value[JSON.stringify(nv)]) {
+        records.value[JSON.stringify(nv)] = []
+    }
+}, { deep: true, immediate: true })
 
 watchEffect(() => {
     if (Game.value) {
@@ -76,6 +89,14 @@ watchEffect(() => {
             }, 1000)
         } else {
             clearInterval(timer)
+            if (Game.value.status === GameStatus.WIN) {
+                if (!records.value[JSON.stringify(options.value)]) {
+                    records.value[JSON.stringify(options.value)] = []
+                } else {
+                    records.value[JSON.stringify(options.value)].push(time.value)
+                    records.value[JSON.stringify(options.value)].sort()
+                }
+            }
         }
     }
 })
