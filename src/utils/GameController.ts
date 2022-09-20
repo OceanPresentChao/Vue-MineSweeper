@@ -123,7 +123,7 @@ export class GameController {
         }
         if (flagCount === block.aroundMines) {
             waitToOpen.forEach((b) => {
-                b.isOpen = true
+                this.openBlock(b)
             })
         }
     }
